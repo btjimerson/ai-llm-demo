@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: ai-llm-demo
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:1234}
+      chat:
+        base-url: ${OPENAI_CHAT_BASE_URL:https://api.openai.com}
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+        dimensions: 1536
+        max-document-batch-size: 10000
+logging:
+  level:
+    root: INFO
+    dev:
+      snbv2:
+        ai: DEBUG
+    org:
+      springframework:
+        ai:
+          chat:
+            client:
+              advisor: INFO
+llm:
+  use-embeddings: ${LLM_USE_EMBEDDINGS:true}

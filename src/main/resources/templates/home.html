@@ -1,0 +1,108 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="theme-color" content="#7952b3">
+    <title>AI RAG Demo</title>
+
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
+    <link th:href="@{/css/application.css}" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="icon" th:href="@{/images/favicon-64.png}" />
+
+</head>
+
+<body>
+    <div class="col-lg-8 mx-auto p-3 py-md-5">
+        <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+            <a href="" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+                <img th:src="@{/images/ai-demo.png}" width="120">
+                <div class="fs-1 text-dark">AI LLM Demo</div>
+            </a>
+        </header>
+        <main>
+            <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="historyModalLabel">Chat History</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="list-group" th:if="${session.chatHistory.chatHistory.size() > 0}">
+                                <a href="#" class="list-group-item list-group-item-action" th:onclick="setPrompt([[${history}]])" th:text="${history}"  
+                                    th:each="history, status: ${session.chatHistory.chatHistory}" data-bs-dismiss="modal"></a>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="fs-4">How can I help you?</div>
+                <div class="row pt-5">
+                    <div class="col-md-12">
+                        <form method="post" th:action="@{/chat}" th:object="${chat}" id="chatForm" name="chatForm">
+                            <div class="row">
+                                <div class="col-8">
+                                    <textarea class="form-control" id="prompt" name="prompt" rows="6" placeholder="Ask me..." required></textarea>
+                                </div>
+                                <div class="col-4">
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <button type="submit" class="btn btn-primary btn-block px-4" data-bs-toggle="tooltip" data-bs-title="Submit Chat" data-bs-placement="top">
+                                                <i class="bi-arrow-up-circle" style="font-size: 1.5rem; color: white;"></i>                                   
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-4">&nbsp;</div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <span data-bs-toggle="modal" data-bs-target="#historyModal">
+                                                <button type="button" class="btn btn-secondary btn-block px-4" data-bs-toggle="tooltip" data-bs-title="View History" data-bs-placement="bottom">
+                                                    <i class="bi-clock-history" style="font-size: 1.5rem; color: white;"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <hr class="my-3 pt-2" th:if="${content}"/>
+                <div class="row" th:if="${content}">
+                    <div class="col">
+                        <img th:src="@{/images/ai-demo.png}" width="40">&nbsp;<span th:text="${chatPrompt}"></span>
+                        <div class="highlight">
+                            <span th:text="${content}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer class="pt-2 my-4 text-muted border-top">
+            <div class="my-2" th:if="${useEmbeddings}"><em>Embeddings are being used to provide more relevant context.</em></div>
+            <div class="my-2" th:if="${!useEmbeddings}"><em>Embeddings are not being used.</em></div>            
+            <div class="my-3">Brian Jimerson &middot; &copy; 2025</div>
+        </footer>
+    </div>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/validate-forms.js}"></script>
+    <script th:src="@{/js/application.js}"></script>
+    <script>
+        function setPrompt(prompt) {
+            document.getElementById("prompt").value = prompt;
+        }
+    </script>
+
+</body>
+
+</html>

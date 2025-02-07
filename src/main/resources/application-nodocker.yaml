@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: ${PG_VECTOR_URL:jdbc:postgresql://localhost:5432/postgres}
+    username: ${PG_VECTOR_USERNAME:postgres}
+    password: ${PG_VECTOR_PASSWORD:password}
+  docker:
+    compose:
+      enabled: false 
