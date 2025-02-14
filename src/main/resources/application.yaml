@@ -3,7 +3,8 @@ spring:
     name: ai-llm-demo
   ai:
     openai:
-      api-key: ${OPENAI_API_KEY:1234}
+      api-key: ${OPENAI_API_KEY:1234abcd}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
       chat:
         base-url: ${OPENAI_CHAT_BASE_URL:https://api.openai.com}
     vectorstore:
