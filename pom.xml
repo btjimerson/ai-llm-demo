@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>dev.snbv2</groupId>
 	<artifactId>ai-llm-demo</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<name>AI LLM Demo</name>
 	<description>Demo AI with LLM application</description>
 	<properties>
