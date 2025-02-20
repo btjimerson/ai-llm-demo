@@ -4,6 +4,10 @@ This application is designed to demonstrate the developer experience with Gloo A
 
 # Walk through
 
+## Flow
+
+![Flow](images/flow.png)
+
 <aside>
 💡
 
