@@ -50,9 +50,9 @@ public class AiDemoConfiguration {
     @Bean
     public ChatClient chatClient(ChatClient.Builder chatClientBuilder, VectorStore vectorStore) {
         if (Boolean.valueOf(useEmbeddings)) {
-            return chatClientBuilder.defaultAdvisors(new QuestionAnswerAdvisor(vectorStore)).build();
+            return chatClientBuilder.defaultAdvisors(new ErrorHandlingAdvisor(), new QuestionAnswerAdvisor(vectorStore)).build();
         } else {
-           return chatClientBuilder.build();
+            return chatClientBuilder.defaultAdvisors(new ErrorHandlingAdvisor()).build();
         }
     }
 
