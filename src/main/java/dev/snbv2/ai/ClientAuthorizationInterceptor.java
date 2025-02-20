@@ -33,9 +33,9 @@ public class ClientAuthorizationInterceptor implements ClientHttpRequestIntercep
                 ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
                 
                 if (attributes != null) {
-                    request.getHeaders().remove(HttpHeaders.AUTHORIZATION);
                     String authorizationToken = (String) attributes.getAttribute(HttpHeaders.AUTHORIZATION, 0);
                     if (authorizationToken != null) {
+                        request.getHeaders().remove(HttpHeaders.AUTHORIZATION);
                         request.getHeaders().add(HttpHeaders.AUTHORIZATION, authorizationToken);
                     }
                 }
