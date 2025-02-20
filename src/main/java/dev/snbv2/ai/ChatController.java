@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import jakarta.servlet.http.HttpSession;
 
-
+/**
+ * Main application MVC controller
+ */
 @Controller
 public class ChatController {
 
@@ -21,6 +23,12 @@ public class ChatController {
     @Value("${llm.use-embeddings}")
 	String useEmbeddings;
     
+    /**
+     * Default view controller.
+     * @param model The model to use for the view.
+     * @param session The HTTP session to use.
+     * @return The view name to use (home.html).
+     */
     @GetMapping(path={"/", "/index"})
     public String index(Model model, HttpSession session) {
         
@@ -34,6 +42,13 @@ public class ChatController {
         return "home";
     }
 
+    /**
+     * Controller method to handle a chat prompt POST.
+     * @param userPrompt The prompt entered by the user.
+     * @param model The model to use for the view.
+     * @param session The HTTP session to use.
+     * @return The view name to use (home.html).
+     */
     @PostMapping("/chat")
     public String chat(@ModelAttribute Chat userPrompt, Model model, HttpSession session) {
 

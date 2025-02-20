@@ -15,6 +15,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
+/**
+ * Entry point for the application
+ */
 @SpringBootApplication
 public class AiDemoApplication implements CommandLineRunner {
 
@@ -26,11 +29,18 @@ public class AiDemoApplication implements CommandLineRunner {
 	@Value("${llm.use-embeddings}")
 	String useEmbeddings;
 
+	/**
+	 * Main entry point for the Spring Boot application
+	 * @param args Any command line arguments passed
+	 */
 	public static void main(String[] args) {
 		SpringApplication.run(AiDemoApplication.class, args);
 	}
 
 
+	/**
+	 * CommandLineRunner method to add embeddings to the vector store if <code>useEmbeddings</code> is true.
+	 */
 	@Override
     public void run(String... args) throws Exception {
 		

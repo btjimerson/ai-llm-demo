@@ -17,10 +17,19 @@ import org.springframework.util.StreamUtils;
 
 import io.micrometer.core.instrument.util.IOUtils;
 
-public class ChatClientInterceptor implements ClientHttpRequestInterceptor {
+/**
+ * ClientHttpRequestInterceptor to log requests and responses for a ChatClient.
+ * 
+ * @author Brian Jimerson
+ */
+public class ChatClientLoggingInterceptor implements ClientHttpRequestInterceptor {
 
-    private static final Log LOG = LogFactory.getLog(ChatClientInterceptor.class);
+    private static final Log LOG = LogFactory.getLog(ChatClientLoggingInterceptor.class);
 
+    /**
+     * Logs requests and responses for a ChatClient. The log level is debug, as this
+     * can be very chatty for LLM requests / responses.
+     */
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
             throws IOException {
@@ -40,6 +49,12 @@ public class ChatClientInterceptor implements ClientHttpRequestInterceptor {
         return wrapper;
     }
 
+    /**
+     * Truncates the request and response bodies (or any string) to the specified length.
+     * @param body The body to truncate.
+     * @param maxLength The maximum length of the body to truncate to.
+     * @return The truncated body, or the original body if it's size is less than maxLength.
+     */
     private String truncateBody(String body, int maxLength) {
         if (body == null || body.length() <= maxLength) {
             return body;
@@ -53,6 +68,10 @@ public class ChatClientInterceptor implements ClientHttpRequestInterceptor {
         }
     }
 
+    /**
+     * Class that buffers an HttpResponse for a ChatClient. The response is only available once
+     * so this is necessary to preserve the response for the ChatClient after logging the response.
+     */
     protected class BufferingClientHttpResponseWrapper implements ClientHttpResponse {
 
         ClientHttpResponse response;

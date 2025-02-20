@@ -13,8 +13,14 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
-public class TokenRequestFilter implements Filter {
+/**
+ * Servlet Filter that gets the Authorization header and sets it in the RequestAttributes.
+ */
+public class AuthorizationFilter implements Filter {
 
+    /**
+     * Gets the Authorization header from the request and sets it in the RequestAttributes.
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
