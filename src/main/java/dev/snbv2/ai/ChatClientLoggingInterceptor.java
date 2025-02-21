@@ -28,12 +28,12 @@ public class ChatClientLoggingInterceptor implements ClientHttpRequestIntercepto
 
     /**
      * Logs requests and responses for a ChatClient. The log level is debug, as this
-     * can be very chatty for LLM requests / responses.
+     * can be very chatty and expensive for LLM requests / responses.
      */
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
             throws IOException {
-        
+
         LOG.debug(String.format("Request: %s %s", request.getMethod(), request.getURI()));
         LOG.debug(String.format("Request Headers: %s", request.getHeaders()));
         LOG.debug(String.format("Request Body: %s", truncateBody(new String(body), 1000)));
@@ -44,16 +44,20 @@ public class ChatClientLoggingInterceptor implements ClientHttpRequestIntercepto
 
         LOG.debug(String.format("Response: %s %s", wrapper.getStatusCode(), wrapper.getStatusText()));
         LOG.debug(String.format("Response Headers: %s", wrapper.getHeaders()));
-        LOG.debug(String.format("Response Body: %s", truncateBody(IOUtils.toString(wrapper.getBody(), Charset.forName("UTF-8")), 1000)));
-    
+        LOG.debug(String.format("Response Body: %s",
+                truncateBody(IOUtils.toString(wrapper.getBody(), Charset.forName("UTF-8")), 1000)));
+
         return wrapper;
     }
 
     /**
-     * Truncates the request and response bodies (or any string) to the specified length.
-     * @param body The body to truncate.
+     * Truncates the request and response bodies (or any string) to the specified
+     * length.
+     * 
+     * @param body      The body to truncate.
      * @param maxLength The maximum length of the body to truncate to.
-     * @return The truncated body, or the original body if it's size is less than maxLength.
+     * @return The truncated body, or the original body if it's size is less than
+     *         maxLength.
      */
     private String truncateBody(String body, int maxLength) {
         if (body == null || body.length() <= maxLength) {
@@ -69,8 +73,10 @@ public class ChatClientLoggingInterceptor implements ClientHttpRequestIntercepto
     }
 
     /**
-     * Class that buffers an HttpResponse for a ChatClient. The response is only available once
-     * so this is necessary to preserve the response for the ChatClient after logging the response.
+     * Class that buffers an HttpResponse for a ChatClient. The response is only
+     * available once
+     * so this is necessary to preserve the response for the ChatClient after
+     * logging the response.
      */
     protected class BufferingClientHttpResponseWrapper implements ClientHttpResponse {
 
@@ -108,7 +114,7 @@ public class ChatClientLoggingInterceptor implements ClientHttpRequestIntercepto
         public void close() {
             this.response.close();
         }
-        
+
     }
-    
+
 }

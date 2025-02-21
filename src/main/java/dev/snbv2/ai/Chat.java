@@ -1,25 +1,18 @@
 package dev.snbv2.ai;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 /**
- * POJO for a chat prompt
+ * POJO to store a chat prompt.
+ * 
+ * @author Brian Jimerson
  */
+@Getter
+@Setter
+@ToString
 public class Chat {
-    
+
     private String prompt;
-
-    /**
-     * Gets the chat prompt.
-     * @return The chat prompt.
-     */
-    public String getPrompt() {
-        return prompt;
-    }
-
-    /**
-     * Sets the chat prompt.
-     * @param prompt The chat prompt.
-     */
-    public void setPrompt(String prompt) {
-        this.prompt = prompt;
-    }
 }

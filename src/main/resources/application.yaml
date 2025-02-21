@@ -26,5 +26,3 @@ logging:
           chat:
             client:
               advisor: INFO
-llm:
-  use-embeddings: ${LLM_USE_EMBEDDINGS:true}

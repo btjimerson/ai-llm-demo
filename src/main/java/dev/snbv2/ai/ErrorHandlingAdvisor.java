@@ -16,7 +16,9 @@ import org.springframework.ai.chat.model.Generation;
 import reactor.core.publisher.Flux;
 
 /**
- * ChatClient Advisor to handle upstream LLM errors gracefully
+ * ChatClient Advisor to handle upstream LLM errors gracefully.
+ * 
+ * @author Brian Jimerson
  */
 public class ErrorHandlingAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
 
@@ -30,20 +32,29 @@ public class ErrorHandlingAdvisor implements CallAroundAdvisor, StreamAroundAdvi
         return 0;
     }
 
+    /**
+     * Attempt to make the next around stream. If an exception occurs, most likely a
+     * 4xx or 5xx HTTP response, use the error message as the chat response instead.
+     */
     @Override
     public Flux<AdvisedResponse> aroundStream(AdvisedRequest advisedRequest, StreamAroundAdvisorChain chain) {
         // Need to implement aroundCall in streaming api
         throw new UnsupportedOperationException("Unimplemented method 'aroundStream'");
     }
 
+    /**
+     * Attempt to make the next around call. If an exception occurs, most likely a
+     * 4xx or 5xx HTTP response, use the error message as the chat response instead.
+     */
     @Override
     public AdvisedResponse aroundCall(AdvisedRequest advisedRequest, CallAroundAdvisorChain chain) {
         try {
             return chain.nextAroundCall(advisedRequest);
         } catch (Exception e) {
-            AssistantMessage assistantMessage = new AssistantMessage(String.format("Error submitting chat request: %s", e.getMessage()));
+            AssistantMessage assistantMessage = new AssistantMessage(
+                    String.format("Error submitting chat request: %s", e.getMessage()));
             ChatResponse chatResponse = new ChatResponse(List.of(new Generation(assistantMessage)));
-            return new AdvisedResponse(chatResponse, new HashMap<String, Object>()); 
+            return new AdvisedResponse(chatResponse, new HashMap<String, Object>());
         }
     }
 
