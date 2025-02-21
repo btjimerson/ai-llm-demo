@@ -1,5 +1,0 @@
-{"properties": [{
-  "name": "llm.use-embeddings",
-  "type": "java.lang.String",
-  "description": "Should the application use embeddings or not"
-}]}
