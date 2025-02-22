@@ -14,5 +14,6 @@ import lombok.ToString;
 @ToString
 public class Chat {
 
+    private String aiModel;
     private String prompt;
 }

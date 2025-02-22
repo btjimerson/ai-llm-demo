@@ -1,0 +1,24 @@
+{
+    "properties": [
+        {
+            "name": "openai.base-url",
+            "type": "java.lang.String",
+            "description": "The base URL for OpenAI"
+        },
+        {
+            "name": "openai.base-url.override",
+            "type": "java.lang.String",
+            "description": "Overide base-url for OpenAI. Used when accessing OpenAI directly"
+        },
+        {
+            "name": "openai.api-key",
+            "type": "java.lang.String",
+            "description": "The API key for OpenAI"
+        },
+        {
+            "name": "ollama.base-url",
+            "type": "java.lang.String",
+            "description": "The base URL for Ollama"
+        }
+    ]
+}

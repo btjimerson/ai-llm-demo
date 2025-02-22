@@ -8,6 +8,8 @@ This application is designed to demonstrate the developer experience with Gloo A
 
 ![Flow](images/flow.png)
 
+# AI Gateway
+
 <aside>
 💡
 
@@ -17,13 +19,21 @@ Make sure you’re using a non-ARM cluster. AI gateway extension isn’t built f
 
 # Build Docker image
 
-Build and push the docker image for the app, if necessary
+Build and push the docker image for the app
 
 ```bash
 docker buildx build . --platform linux/amd64,linux/arm64 -t btjimerson/ai-llm-demo:0.0.1-SNAPSHOT
 
 docker push btjimerson/ai-llm-demo:0.0.1-SNAPSHOT
 ```
+
+# Auth0 Setup
+
+Domain: dev-phabkp71kmbjfe8n.us.auth0.com
+
+Client ID: hvhbpxSFSfIJV85lowYoFZfmSDoDO0Ik
+
+Client secret: rqjxShtckJ8JX7F3RfCDcAIbPc78YMq5MeNCAwr4Vljf7Bi51OJB_csrgiskhBc4
 
 # Gloo Gateway
 
@@ -100,15 +110,13 @@ EOF
 kubectl rollout status -n gloo-system deployments/gloo-proxy-http
 ```
 
-Get the endpoint for the gateway. Alternatively you can create a CNAME record that points to the ingress gateway and use that record for AI_RAG_DEMO_HOSTNAME:
+Get the endpoint for the gateway. Alternatively you can create a CNAME record that points to the ingress gateway and use that record for AI_LLM_DEMO_HOSTNAME:
 
 ```bash
 export AI_LLM_DEMO_HOSTNAME=$(kubectl get svc -n gloo-system gloo-proxy-http -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
 
 echo "Gateway Hostname = $AI_LLM_DEMO_HOSTNAME"
 ```
-
-# AI Gateway
 
 ## Installation
 
@@ -225,7 +233,7 @@ spec:
         type: PathPrefix
         value: /openai
     backendRefs:
-    - name: openai
+    **- name: openai
       namespace: gloo-system
       group: gloo.solo.io
       kind: Upstream
@@ -257,36 +265,6 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: ai-llm-demo
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: pgvector
-  namespace: ai-llm-demo
-  labels:
-    app: pgvector
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: pgvector
-  template:
-    metadata:
-      labels:
-        app: pgvector
-    spec:
-      containers:
-      - name: pgvector
-        image: pgvector/pgvector:pg16
-        ports:
-        - containerPort: 5432
-        env:
-          - name: POSTGRES_DB
-            value: ai-llm-demo
-          - name: POSTGRES_USER
-            value: postgres
-          - name: POSTGRES_PASSWORD
-            value: postgres
 ---
 apiVersion: v1
 kind: Service
@@ -327,20 +305,14 @@ spec:
         ports:
         - containerPort: 8080
         env:
-          - name: SPRING_PROFILES_ACTIVE
-            value: nodocker
-          - name: LLM_USE_EMBEDDINGS
-            value: "false"
-          - name: OPENAI_CHAT_BASE_URL
-            value: http://gloo-proxy-ai-gateway.gloo-system.svc:8080/openai
           - name: OPENAI_API_KEY
-            value: $OPENAI_API_KEY
-          - name: PG_VECTOR_URL
-            value: jdbc:postgresql://pgvector.ai-llm-demo.svc:5432/ai-llm-demo
-          - name: PG_VECTOR_USERNAME
-            value: postgres
-          - name: PG_VECTOR_PASSWORD
-            value: postgres
+            value: abcd1234
+          - name: OPENAI_BASE_URL
+            value: http://gloo-proxy-ai-gateway.gloo-system.svc:8080/openai
+          - name: OPENAI_BASE_URL_OVERRIDE
+            value: https://api.openai.com
+          - name: OLLAMA_BASE_URL
+            value: ollama-qwen.ollama.svc.cluster.local:11434
 ---
 apiVersion: v1
 kind: Service

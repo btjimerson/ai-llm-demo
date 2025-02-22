@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="theme-color" content="#7952b3">
-    <title>AI RAG Demo</title>
+    <title>AI LLM Demo</title>
 
     <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
     <link th:href="@{/css/application.css}" rel="stylesheet" />
@@ -15,15 +15,61 @@
 </head>
 
 <body>
+    <nav class="navbar navbar-expand-md fixed-top bg-body-secondary">
+        <div class="container">
+            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+                <a class="navbar-brand d-flex flex-wrap align-items-center justify-content-lg-start" th:href="@{/}">AI LLM Demo</a>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <form class="d-flex" th:action="@{/changeModel}" th:object="${model}">
+                        <ul class="navbar-nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    <span th:if="${aiModel eq 'openai'}">OpenAI</span>
+                                    <span th:if="${aiModel eq 'ollama'}">Ollama</span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" th:href="@{/aimodel/openai}">
+                                            <span th:if="${aiModel eq 'openai'}">&#x2713;</span> OpenAI
+                                        </a></li>
+                                    <li><a class="dropdown-item" th:href="@{/aimodel/ollama}">
+                                            <span th:if="${aiModel eq 'ollama'}">&#x2713;</span> Ollama
+                                        </a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
+                                <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-dark"></div>
+                                <hr class="d-lg-none my-2 text-dark-50">
+                            </li>
+                        </ul>
+                    </form>
+                </div>
+            </div>
+            <div class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" th:if="${apiKeyOverride eq false}">
+                <form class="d-flex" name="apiKeyForm" th:action="@{/overrideApiKey}" method="POST">
+                    <input class="form-control" name="apiKey" type="text" placeholder="Override API Key" data-bs-toggle="tooltip" data-bs-title="Overrides the default OpenAI API key"
+                    data-bs-placement="bottom"/>&nbsp;
+                    <button type="submit" name="apiKeySubmit" class="btn btn-primary text-end">Set</button>
+                </form>
+            </div>
+            <div class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" th:if="${apiKeyOverride eq true}">
+                <a th:href="@{/removeApiKeyOverride}" name="removeApiKeyLink" class="btn btn-primary text-end" data-bs-toggle="tooltip" data-bs-title="Removes the API key override"
+                data-bs-placement="bottom">Remove API Key</a>
+            </div>
+        </div>
+        </div>
+    </nav>
     <div class="col-lg-8 mx-auto p-3 py-md-5">
         <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-            <a href="" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+            <a href="#"
+                class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
                 <img th:src="@{/images/ai-demo.png}" width="120">
                 <div class="fs-1 text-dark">AI LLM Demo</div>
             </a>
         </header>
         <main>
-            <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
+            <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel"
+                aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -32,8 +78,10 @@
                         </div>
                         <div class="modal-body">
                             <div class="list-group" th:if="${session.chatHistory.chatHistory.size() > 0}">
-                                <a href="#" class="list-group-item list-group-item-action" th:onclick="setPrompt([[${history}]])" th:text="${history}"  
-                                    th:each="history, status: ${session.chatHistory.chatHistory}" data-bs-dismiss="modal"></a>
+                                <a href="#" class="list-group-item list-group-item-action"
+                                    th:onclick="setPrompt([[${history}]])" th:text="${history}"
+                                    th:each="history, status: ${session.chatHistory.chatHistory}"
+                                    data-bs-dismiss="modal"></a>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -46,15 +94,20 @@
                 <div class="row pt-5">
                     <div class="col-md-12">
                         <form method="post" th:action="@{/chat}" th:object="${chat}" id="chatForm" name="chatForm">
+                            <input type="hidden" name="aiModel" th:value="${aiModel}" />
                             <div class="row">
                                 <div class="col-8">
-                                    <textarea class="form-control" id="prompt" name="prompt" rows="6" placeholder="Ask me..." required></textarea>
+                                    <textarea class="form-control" id="prompt" name="prompt" rows="6"
+                                        placeholder="Ask me something..." required></textarea>
                                 </div>
                                 <div class="col-4">
                                     <div class="row">
                                         <div class="col-4">
-                                            <button type="submit" class="btn btn-primary btn-block px-4" data-bs-toggle="tooltip" data-bs-title="Submit Chat" data-bs-placement="top">
-                                                <i class="bi-arrow-up-circle" style="font-size: 1.5rem; color: white;"></i>                                   
+                                            <button type="submit" class="btn btn-primary btn-block px-4"
+                                                data-bs-toggle="tooltip" data-bs-title="Submit Chat"
+                                                data-bs-placement="top">
+                                                <i class="bi-arrow-up-circle"
+                                                    style="font-size: 1.5rem; color: white;"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -64,8 +117,11 @@
                                     <div class="row">
                                         <div class="col-4">
                                             <span data-bs-toggle="modal" data-bs-target="#historyModal">
-                                                <button type="button" class="btn btn-secondary btn-block px-4" data-bs-toggle="tooltip" data-bs-title="View History" data-bs-placement="bottom">
-                                                    <i class="bi-clock-history" style="font-size: 1.5rem; color: white;"></i>
+                                                <button type="button" class="btn btn-secondary btn-block px-4"
+                                                    data-bs-toggle="tooltip" data-bs-title="View History"
+                                                    data-bs-placement="bottom">
+                                                    <i class="bi-clock-history"
+                                                        style="font-size: 1.5rem; color: white;"></i>
                                                 </button>
                                             </span>
                                         </div>
@@ -75,7 +131,7 @@
                         </form>
                     </div>
                 </div>
-                <hr class="my-3 pt-2" th:if="${content}"/>
+                <hr class="my-3 pt-2" th:if="${content}" />
                 <div class="row" th:if="${content}">
                     <div class="col">
                         <img th:src="@{/images/ai-demo.png}" width="40">&nbsp;<span th:text="${chatPrompt}"></span>
@@ -87,9 +143,7 @@
             </div>
         </main>
         <footer class="pt-2 my-4 text-muted border-top">
-            <div class="my-2" th:if="${useEmbeddings}"><em>Embeddings are being used to provide more relevant context.</em></div>
-            <div class="my-2" th:if="${!useEmbeddings}"><em>Embeddings are not being used.</em></div>            
-            <div class="my-3">Brian Jimerson &middot; &copy; 2025</div>
+            <div class="my-3"><em>Brought to you by Solo.io &middot; &copy; 2025</em></div>
         </footer>
     </div>
 
