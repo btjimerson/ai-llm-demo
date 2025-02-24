@@ -1,30 +1,21 @@
 package dev.snbv2.ai;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
+import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.ai.ollama.management.ModelManagementOptions;
-import org.springframework.ai.ollama.management.PullModelStrategy;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.web.client.RestClientBuilderConfigurer;
 import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * Configuration class for the application.
@@ -43,38 +34,23 @@ public class AiDemoConfiguration {
     @Value("${ollama.base-url}")
     String ollamaBaseUrl;
 
+    @Value("${ollama.model}")
+    String ollamaModel;
+
     /**
-     * Creates a RestClient (wrapped by a ChatClient) with specific client
-     * interceptors attached.
+     * Creates a REST client builder with custom interceptors to be used by chat
+     * clients.
      * 
-     * @param configurer The Rest Client Configurer to use
-     * @return A RestClient Builder with the specific interceptors.
+     * @return A REST client builder for use by chat clients.
      */
     @Bean
-    @Scope("prototype")
-    RestClient.Builder restClientBuilder(RestClientBuilderConfigurer configurer) {
+    public RestClient.Builder restClientBuilder() {
         RestClient.Builder builder = RestClient
                 .builder()
                 .requestFactory(ClientHttpRequestFactoryBuilder.simple().build())
                 .requestInterceptor(new ClientAuthorizationInterceptor())
                 .requestInterceptor(new ChatClientLoggingInterceptor());
-
-        return configurer.configure(builder);
-
-    }
-
-    @Bean
-    public RestTemplate restTemplate() {
-
-        RestTemplate restTemplate = new RestTemplate();
-        List<ClientHttpRequestInterceptor> interceptors = restTemplate.getInterceptors();
-        if (CollectionUtils.isEmpty(interceptors)) {
-            interceptors = new ArrayList<>();
-        }
-        interceptors.add(new ChatClientLoggingInterceptor());
-        restTemplate.setInterceptors(interceptors);
-        return restTemplate;
-
+        return builder;
     }
 
     /**
@@ -84,9 +60,9 @@ public class AiDemoConfiguration {
      */
     @Bean
     @Qualifier("openAiChatClient")
-    public ChatClient openAiChatClient() {
+    public ChatClient openAiChatClient(RestClient.Builder restClientBuilder) {
 
-        OpenAiApi openAiApi = new OpenAiApi(openAiBaseUrl, openAiApiKey);
+        OpenAiApi openAiApi = new OpenAiApi(openAiBaseUrl, openAiApiKey, restClientBuilder, WebClient.builder());
         OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
                 .model("gpt-4o")
                 .temperature(0.4)
@@ -106,14 +82,14 @@ public class AiDemoConfiguration {
      */
     @Bean
     @Qualifier("ollamaChatClient")
-    public ChatClient ollamaChatClient() {
+    public ChatClient ollamaChatClient(RestClient.Builder restClientBuilder) {
 
-        OllamaApi ollamaApi = new OllamaApi(ollamaBaseUrl);
-        ModelManagementOptions modelManagementOptions = new ModelManagementOptions(
-                PullModelStrategy.WHEN_MISSING, null, Duration.ofMinutes(5), Integer.valueOf(2));
+        OllamaApi ollamaApi = new OllamaApi(ollamaBaseUrl, restClientBuilder, WebClient.builder());
+        OllamaOptions ollamaOptions = OllamaOptions.builder().model(ollamaModel).build();
         OllamaChatModel ollamaChatModel = OllamaChatModel.builder()
                 .ollamaApi(ollamaApi)
-                .modelManagementOptions(modelManagementOptions)
+                .defaultOptions(ollamaOptions)
+                .modelManagementOptions(ModelManagementOptions.defaults())
                 .build();
         ChatClient.Builder ollamaClientBuilder = ChatClient.builder(ollamaChatModel);
         return ollamaClientBuilder.build();

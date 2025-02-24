@@ -18,28 +18,37 @@
     <nav class="navbar navbar-expand-md fixed-top bg-body-secondary">
         <div class="container">
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                <a class="navbar-brand d-flex flex-wrap align-items-center justify-content-lg-start" th:href="@{/}">AI LLM Demo</a>
+                <a class="navbar-brand d-flex flex-wrap align-items-center justify-content-lg-start" th:href="@{/}">AI
+                    LLM Demo</a>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <form class="d-flex" th:action="@{/changeModel}" th:object="${model}">
                         <ul class="navbar-nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                    <span th:if="${aiModel eq 'openai'}">OpenAI</span>
-                                    <span th:if="${aiModel eq 'ollama'}">Ollama</span>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" th:href="@{/aimodel/openai}">
-                                            <span th:if="${aiModel eq 'openai'}">&#x2713;</span> OpenAI
-                                        </a></li>
-                                    <li><a class="dropdown-item" th:href="@{/aimodel/ollama}">
-                                            <span th:if="${aiModel eq 'ollama'}">&#x2713;</span> Ollama
-                                        </a></li>
-                                </ul>
-                            </li>
                             <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
                                 <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-dark"></div>
                                 <hr class="d-lg-none my-2 text-dark-50">
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false" th:if="${apiKeyOverride eq false}">
+                                    <span th:if="${aiModel eq 'openai'}">OpenAI</span>
+                                    <span th:if="${aiModel eq 'ollama'}">Ollama</span>
+                                </a>
+                                <a class="nav-link dropdown-toggle disabled" href="#" role="button" aria-disabled="true"
+                                    aria-expanded="false" th:if="${apiKeyOverride eq true}">
+                                    OpenAI
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" th:href="@{/aimodel/openai}">
+                                            <span th:if="${aiModel eq 'openai'}">&#x2713; </span>OpenAI
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" th:href="@{/aimodel/ollama}">
+                                            <span th:if="${aiModel eq 'ollama'}">&#x2713; </span>Ollama
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                         </ul>
                     </form>
@@ -47,14 +56,14 @@
             </div>
             <div class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" th:if="${apiKeyOverride eq false}">
                 <form class="d-flex" name="apiKeyForm" th:action="@{/overrideApiKey}" method="POST">
-                    <input class="form-control" name="apiKey" type="text" placeholder="Override API Key" data-bs-toggle="tooltip" data-bs-title="Overrides the default OpenAI API key"
-                    data-bs-placement="bottom"/>&nbsp;
+                    <input class="form-control" name="apiKey" type="text" placeholder="Override API Key" />&nbsp;
                     <button type="submit" name="apiKeySubmit" class="btn btn-primary text-end">Set</button>
                 </form>
             </div>
             <div class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" th:if="${apiKeyOverride eq true}">
-                <a th:href="@{/removeApiKeyOverride}" name="removeApiKeyLink" class="btn btn-primary text-end" data-bs-toggle="tooltip" data-bs-title="Removes the API key override"
-                data-bs-placement="bottom">Remove API Key</a>
+                <a th:href="@{/removeApiKeyOverride}" name="removeApiKeyLink" class="btn btn-primary text-end">
+                    Remove API Key
+                </a>
             </div>
         </div>
         </div>

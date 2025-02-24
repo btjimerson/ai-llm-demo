@@ -41,8 +41,6 @@ public class ChatController {
     @Value("${openai.base-url.override}")
     String openAiBaseUrlOverride;
 
-    String aiModel;
-
     /**
      * Default view controller.
      * 
@@ -55,7 +53,7 @@ public class ChatController {
 
         Chat chat = new Chat();
         model.addAttribute("chat", chat);
-        setViewAttributes(session, model, aiModel == null ? "openai" : aiModel);
+        setViewAttributes(session, model, "openai");
 
         return "home";
     }
@@ -112,7 +110,6 @@ public class ChatController {
     @GetMapping("/aimodel/{aiModel}")
     public String changeAiModel(@PathVariable String aiModel, Model model, HttpSession session) {
 
-        this.aiModel = aiModel;
         setViewAttributes(session, model, aiModel);
 
         return "home";
@@ -142,7 +139,6 @@ public class ChatController {
         openAiClientBuilder.defaultAdvisors(new ErrorHandlingAdvisor());
         openAiOverrideChatClient = openAiClientBuilder.build();
 
-        aiModel = "openai";
         setViewAttributes(session, model, "openai");
 
         return "home";
@@ -151,7 +147,7 @@ public class ChatController {
     /**
      * Removes the API key override by setting the openAiOverrideChatClient to null.
      * 
-     * @param model The model to use.
+     * @param model   The model to use.
      * @param session The HTTP session to use.
      * @return The view to use (home.html).
      */
@@ -159,7 +155,7 @@ public class ChatController {
     public String removeApiKeyOverride(Model model, HttpSession session) {
 
         openAiOverrideChatClient = null;
-        setViewAttributes(session, model, aiModel == null ? "openai" : aiModel);
+        setViewAttributes(session, model, "openai");
 
         return "home";
     }
